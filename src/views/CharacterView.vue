@@ -59,13 +59,23 @@ const traps = computed<Card[]>(() => (lanes.value.find((l) => l.tier === 'D')?.c
 const startDeck = computed(() => (character.value?.starting_deck ?? []).map((id) => cardById.get(id)).filter(Boolean) as Card[]);
 const startRelics = computed(() => (character.value?.starting_relics ?? []).map((id) => relicById.get(id)).filter(Boolean));
 
-// builds : résout les enablers par nom
-function resolveEnablers(names: string[]): { card?: Card; name: string }[] {
-  return names.map((n) => {
-    const card = cards.find((c) => c.name.toLowerCase() === n.toLowerCase());
-    return card ? { card, name: n } : { name: n };
-  });
+// builds DATA-DRIVEN : matche les vraies cartes de la classe par thème (terms),
+// triées par win-impact. Plus de noms en dur → plus de cases vides.
+function archetypeCards(terms: string[]): Card[] {
+  const id = charId.value!;
+  return pool.value
+    .filter((c) => {
+      const hay = `${c.name} ${c.description} ${(c.keywords || []).join(' ')} ${(c.tags || []).join(' ')}`.toLowerCase();
+      return terms.some((t) => hay.includes(t));
+    })
+    .sort((a, b) => (cardScore(b.id, id)?.score ?? -1) - (cardScore(a.id, id)?.score ?? -1))
+    .slice(0, 8);
 }
+function verdictFor(id_: string): 'pick' | 'meh' | 'skip' | null {
+  const t = rankMap.value.get(id_);
+  return !t ? null : t === 'S' || t === 'A' ? 'pick' : t === 'B' ? 'meh' : 'skip';
+}
+const buildRows = computed(() => (meta.value?.archetypes ?? []).map((a) => ({ name: a.name, blurb: a.blurb, cards: archetypeCards(a.terms) })));
 
 const tabOpts = [{ value: 'tiers', label: 'Tier list' }, { value: 'builds', label: 'Builds' }];
 const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
@@ -130,17 +140,15 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
     <!-- BUILDS -->
     <div v-else class="builds">
       <p class="note">Archétypes principaux et leurs cartes-clés. La couche éditoriale explique le « pourquoi » ; les tiers ci-dessus donnent les chiffres.</p>
-      <Reveal v-for="(a, i) in meta.archetypes" :key="a.name" :index="i" tag="div">
+      <Reveal v-for="(a, i) in buildRows" :key="a.name" :index="i" tag="div">
         <article class="build">
           <div class="build-head">
             <h3 class="build-name">{{ a.name }}</h3>
             <p class="build-blurb">{{ a.blurb }}</p>
           </div>
           <div class="build-cards">
-            <template v-for="(e, j) in resolveEnablers(a.enablers)" :key="j">
-              <GameCard v-if="e.card" :card="e.card" :char="charId!" verdict="pick" @open="openCard = $event" />
-              <span v-else class="missing" :title="'Carte introuvable dans les données actuelles'">{{ e.name }}</span>
-            </template>
+            <GameCard v-for="c in a.cards" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" :verdict="verdictFor(c.id)" @open="openCard = $event" />
+            <p v-if="!a.cards.length" class="muted">Pas encore de cartes identifiées pour cet axe (données EA).</p>
           </div>
         </article>
       </Reveal>
@@ -202,7 +210,7 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
 .trapblock { border-color: color-mix(in oklab, var(--bad) 30%, var(--hairline)); }
 .build-blurb { color: var(--ink-2); font-size: 15px; margin: 0; }
 .build-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; align-items: start; }
-.missing { display: inline-flex; align-items: center; justify-content: center; padding: 8px; border: 1px dashed var(--hairline-2); border-radius: var(--r-sm); color: var(--ink-4); font-size: 13px; font-style: italic; min-height: 60px; }
+.muted { color: var(--ink-3); font-size: 14px; font-style: italic; padding: 8px 0; }
 
 @media (max-width: 720px) { .chero { grid-template-columns: 1fr; } .cportrait { max-width: 200px; } .lane { grid-template-columns: 6px 40px 1fr; } }
 </style>
