@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Assets téléchargés via `npm run ingest` (© Mega Crit — non redistribués dans le repo).
+# Repeupler avec : npm run ingest
+/public/cards/
+/public/relics/
+/public/potions/
+/public/characters/

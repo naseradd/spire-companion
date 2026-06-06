@@ -1,0 +1,201 @@
+/* ============================================================
+   Spire Codex Companion — design system "gothic occult manuscript"
+   Délibérément à l'opposé du "field terminal" tactique (EFT).
+   Tokens + base + texture + utilitaires + per-character accents.
+   ============================================================ */
+
+:root {
+  /* — surfaces : charcoal → aubergine, biais violet chaud (occulte, pas forêt) — */
+  --canvas: #0b0a0d;
+  --surface: #14121a;
+  --surface-2: #1c1825;
+  --raised: #221c2e;
+  --raised-2: #2a2338;
+  --popover: #2a2236;
+  --hairline: rgba(236, 230, 242, 0.08);
+  --hairline-2: rgba(236, 230, 242, 0.15);
+  --highlight: rgba(255, 252, 245, 0.04);
+
+  /* — texte : ivoire, jamais blanc pur — */
+  --ink: rgba(236, 230, 242, 0.92);
+  --ink-2: rgba(236, 230, 242, 0.6);
+  --ink-3: rgba(236, 230, 242, 0.4);
+  --ink-4: rgba(236, 230, 242, 0.26);
+
+  /* — or enluminé : chrome global premium — */
+  --gold: #c9a24b;
+  --gold-hi: #e4c76a;
+  --gold-dim: #9c7d38;
+  --gold-soft: rgba(201, 162, 75, 0.14);
+  --gold-glow: rgba(201, 162, 75, 0.34);
+  --ink-on-gold: #1a1410;
+
+  /* accent actif (défaut = or ; surchargé par perso via [data-char]) */
+  --accent: var(--gold);
+  --accent-hi: var(--gold-hi);
+  --accent-dim: var(--gold-dim);
+  --accent-soft: var(--gold-soft);
+  --accent-glow: var(--gold-glow);
+  --accent-ink: var(--ink-on-gold);
+
+  /* sémantique */
+  --good: #2fae73;
+  --warn: #e0a52e;
+  --bad: #c0392b;
+  --info: #3e78d4;
+
+  /* tiers (S/A/B/C/D) */
+  --tier-s: #e4c76a;
+  --tier-a: #2fae73;
+  --tier-b: #3e78d4;
+  --tier-c: #9a93a8;
+  --tier-d: #b5544a;
+
+  /* raretés cartes */
+  --r-common: #b9b3c4;
+  --r-uncommon: #6f9bd6;
+  --r-rare: #e4c76a;
+  --r-ancient: #b5478c;
+  --r-curse: #8a5cf0;
+  --r-status: #8b8694;
+
+  /* — typo (serif manuscrit, anti-terminal) — */
+  --font-display: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Spectral', Georgia, 'Times New Roman', serif;
+  --font-black: 'Pirata One', var(--font-display);
+  --num: 'Spectral', Georgia, serif;
+
+  /* — forme — */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 13px;
+  --r-lg: 18px;
+  --r-xl: 26px;
+  --r-pill: 999px;
+
+  /* — profondeur (inner-glow doux, pas bordures dures) — */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 6px 26px rgba(201, 162, 75, 0.2);
+
+  /* — mouvement — */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --t1: 0.15s;
+  --t2: 0.26s;
+  --t3: 0.4s;
+}
+
+/* per-character jewel accents (saturation boostée, jamais néon) */
+[data-char='ironclad']    { --accent: #c0392b; --accent-hi: #e0584a; --accent-dim: #8f2a20; --accent-soft: rgba(192, 57, 43, 0.16); --accent-glow: rgba(192, 57, 43, 0.4); --accent-ink: #fff5f3; }
+[data-char='silent']      { --accent: #2fae73; --accent-hi: #4fd394; --accent-dim: #20805420; --accent-dim: #218054; --accent-soft: rgba(47, 174, 115, 0.16); --accent-glow: rgba(47, 174, 115, 0.4); --accent-ink: #06140d; }
+[data-char='defect']      { --accent: #3e78d4; --accent-hi: #6fa0ec; --accent-dim: #2b568f; --accent-soft: rgba(62, 120, 212, 0.16); --accent-glow: rgba(62, 120, 212, 0.4); --accent-ink: #f0f6ff; }
+[data-char='regent']      { --accent: #e0a52e; --accent-hi: #f4c459; --accent-dim: #a87a1d; --accent-soft: rgba(224, 165, 46, 0.16); --accent-glow: rgba(224, 165, 46, 0.4); --accent-ink: #1c1405; }
+[data-char='necrobinder'] { --accent: #b5478c; --accent-hi: #d76fb0; --accent-dim: #823263; --accent-soft: rgba(181, 71, 140, 0.16); --accent-glow: rgba(181, 71, 140, 0.4); --accent-ink: #fdf2f9; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+#app { min-height: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--canvas);
+  background-image:
+    radial-gradient(120% 90% at 50% -10%, #1a1426 0%, rgba(26, 20, 38, 0) 55%),
+    radial-gradient(90% 70% at 100% 0%, rgba(181, 71, 140, 0.06) 0%, rgba(181, 71, 140, 0) 45%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+}
+
+/* parchemin / bave d'encre — texture quasi-imperceptible (pas de scanline tactique) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+a { color: var(--gold); text-decoration: none; transition: color var(--t1) var(--ease); }
+a:hover { color: var(--gold-hi); }
+button { font-family: inherit; color: inherit; }
+input, select, textarea { font-family: inherit; }
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--canvas), 0 0 0 4px var(--accent-glow); border-radius: var(--r-xs); }
+
+* { scrollbar-width: thin; scrollbar-color: #3a3348 transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #352e44; border: 3px solid transparent; background-clip: padding-box; border-radius: var(--r-pill); }
+::-webkit-scrollbar-thumb:hover { background: #4a4060; background-clip: padding-box; }
+
+/* ---------- typographie utilitaire ---------- */
+.num { font-variant-numeric: tabular-nums; }
+.ink-2 { color: var(--ink-2); }
+.ink-3 { color: var(--ink-3); }
+
+.kicker {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-block;
+}
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(34px, 4.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 6px 0 10px;
+  color: var(--ink);
+}
+.lead { color: var(--ink-2); font-size: 17px; line-height: 1.6; max-width: 64ch; margin: 0 0 24px; }
+.section-title { font-family: var(--font-display); font-weight: 600; font-size: 26px; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 14px; }
+.wordmark { font-family: var(--font-black); letter-spacing: 0.5px; }
+
+/* filigrane : séparateur ornemental */
+.filigree { height: 1px; border: none; background: linear-gradient(90deg, transparent, var(--hairline-2) 20%, var(--accent-dim) 50%, var(--hairline-2) 80%, transparent); margin: 24px 0; }
+
+/* ---------- keyframes ---------- */
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes float-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes ember { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* route transition */
+.view-enter-active { transition: opacity var(--t3) var(--ease-out-expo), transform var(--t3) var(--ease-out-expo); }
+.view-leave-active { transition: opacity 0.18s var(--ease); }
+.view-enter-from { opacity: 0; transform: translateY(12px); }
+.view-leave-to { opacity: 0; }
+
+/* scroll-reveal */
+.reveal { opacity: 0; transform: translateY(18px); will-change: transform, opacity; }
+.reveal.in { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out-expo), transform 0.7s var(--ease-out-expo); transition-delay: var(--reveal-delay, 0ms); }
+
+/* press feedback global */
+.btn, .chip, .seg-btn, .navlink, .tab, .step, .pill-btn {
+  transition-property: transform, background, color, border-color, box-shadow, opacity;
+  transition-duration: var(--t1);
+  transition-timing-function: var(--ease-out-quart);
+}
+.btn:active, .chip:active, .seg-btn:active, .navlink:active, .tab:active, .step:active:not(:disabled), .pill-btn:active { transform: scale(0.96); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
