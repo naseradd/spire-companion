@@ -9,6 +9,8 @@ import { existsSync } from 'node:fs';
 
 const API = 'https://spire-codex.com/api';
 const HOST = 'https://spire-codex.com';
+// source de secours (datamined, même schéma) si l'API spire-codex est indisponible
+const MIRROR = 'https://raw.githubusercontent.com/nkhoit/spire-archive/main/data/sts2';
 const UA = { 'User-Agent': 'sts2-companion/1.0 (personal fan tool)' };
 const CHARS = ['IRONCLAD', 'SILENT', 'DEFECT', 'NECROBINDER', 'REGENT'];
 const DATA_DIR = 'src/data';
@@ -31,12 +33,21 @@ async function getJSON(url, tries = 3) {
 }
 
 /* ---------------- DATA ---------------- */
+// contenu : spire-codex en priorité, sinon repli sur le miroir nkhoit (même schéma)
+async function getContent(name) {
+  try {
+    return await getJSON(`${API}/${name}`);
+  } catch (e) {
+    console.warn(`  ! spire-codex /${name} KO (${e.message}) → repli miroir nkhoit`);
+    return await getJSON(`${MIRROR}/${name}.json`);
+  }
+}
 console.log('• Fetching reference data…');
 const [cardsRaw, characters, relicsRaw, potions, keywords] = await Promise.all([
-  getJSON(`${API}/cards`),
-  getJSON(`${API}/characters`),
-  getJSON(`${API}/relics`),
-  getJSON(`${API}/potions`),
+  getContent('cards'),
+  getContent('characters'),
+  getContent('relics'),
+  getContent('potions'),
   getJSON(`${API}/keywords`).catch(() => []),
 ]);
 let events = await getJSON(`${API}/events`).catch(() => []);

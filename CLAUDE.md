@@ -24,6 +24,12 @@ Source unique : **spire-codex.com** (API publique FastAPI, dataminée du jeu, CO
 
 5 persos : **Ironclad, Silent, Defect + Necrobinder & Regent** (Watcher absent en EA).
 
+### Cartes manquantes / résilience data
+- **Image manquante** : `CardImg` tente local `/cards/<id>` → fallback hotlink `spire-codex.com<image_url>` → placeholder. La `GameCard` reste lisible sans art (bannière + coût + description = data réelle).
+- **Rating manquant / faible échantillon** (`picks < 300`) : exclu des tiers, listé dans « Données insuffisantes », grisé, pas de verdict (jamais de note bruitée présentée comme fiable).
+- **Carte absente de la source** (nouvelle carte EA pas encore extraite) : `npm run ingest` après MAJ spire-codex (piloté par `meta.recentChanges`). L'app ne fabrique jamais de carte.
+- **Source de secours** : l'ingest bascule auto sur le miroir **nkhoit/spire-archive** (même schéma) si l'API spire-codex est indisponible (contenu seulement ; les run-stats/tiers n'ont pas de miroir → tiers vides + cartes affichées). wiki.gg écarté (Cloudflare 403).
+
 ## Architecture
 ```
 src/
