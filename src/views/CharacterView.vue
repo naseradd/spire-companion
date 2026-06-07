@@ -241,8 +241,8 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
       </template>
     </div>
 
-    <CardModal :card="openCard" @close="openCard = null" />
-    <RelicModal :relic="openRelic" @close="openRelic = null" />
+    <CardModal :card="openCard" @close="openCard = null" @open="openCard = $event" />
+    <RelicModal :relic="openRelic" @close="openRelic = null" @card="openRelic = null; openCard = $event" />
   </section>
   <section v-else class="page"><p class="lead">Personnage inconnu. <RouterLink to="/">Retour au Codex</RouterLink></p></section>
 </template>

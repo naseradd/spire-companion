@@ -146,7 +146,7 @@ function goChar(slug: string) { router.push('/c/' + slug); }
       </Reveal>
     </section>
 
-    <CardModal :card="openCard" @close="openCard = null" />
+    <CardModal :card="openCard" @close="openCard = null" @open="openCard = $event" />
   </section>
 </template>
 

@@ -89,7 +89,7 @@ const viewOpts = [{ value: 'gallery', label: 'Galerie' }, { value: 'table', labe
       <template #cell-sc="{ row }"><ScoreMeter :score="row.scoreObj" /></template>
     </DataTable>
 
-    <CardModal :card="openCard" @close="openCard = null" />
+    <CardModal :card="openCard" @close="openCard = null" @open="openCard = $event" />
   </section>
 </template>
 

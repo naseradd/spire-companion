@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { relics, relicById, charById, PLAYABLE, normId, type Relic, type CharId } from '@/lib/data';
+import { relics, relicById, charById, PLAYABLE, normId, type Relic, type Card, type CharId } from '@/lib/data';
 import { CHAR_META } from '@/lib/characters';
 import { plainText } from '@/lib/bbcode';
 import { relicScore } from '@/lib/tier';
 import RelicCell from '@/components/RelicCell.vue';
 import RelicModal from '@/components/RelicModal.vue';
+import CardModal from '@/components/CardModal.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import Reveal from '@/components/ui/Reveal.vue';
 
@@ -14,6 +15,7 @@ const search = ref('');
 const rarity = ref('all');
 const selChar = ref<CharId>('IRONCLAD');
 const openRelic = ref<Relic | null>(null);
+const openCard = ref<Card | null>(null);
 
 const rarities = [...new Set(relics.map((r) => r.rarity))].sort();
 const modeOpts = [{ value: 'rarity', label: 'Par rareté' }, { value: 'class', label: 'Par classe' }, { value: 'impact', label: 'Win-impact' }];
@@ -95,7 +97,8 @@ const synergy = computed<Relic[]>(() => {
       </Reveal>
     </template>
 
-    <RelicModal :relic="openRelic" @close="openRelic = null" />
+    <RelicModal :relic="openRelic" @close="openRelic = null" @card="openRelic = null; openCard = $event" />
+    <CardModal :card="openCard" @close="openCard = null" @open="openCard = $event" />
   </section>
 </template>
 

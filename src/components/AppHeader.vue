@@ -7,6 +7,7 @@ import { dateFr } from '@/lib/format';
 const charAccent: Record<string, string> = {
   IRONCLAD: '#c0392b', SILENT: '#2fae73', DEFECT: '#3e78d4', REGENT: '#e0a52e', NECROBINDER: '#b5478c',
 };
+defineEmits<{ (e: 'open-search'): void }>();
 const nav = [
   { to: '/', label: 'Codex', exact: true },
   { to: '/cards', label: 'Cartes' },
@@ -25,6 +26,10 @@ const nav = [
     <nav class="nav">
       <RouterLink v-for="n in nav" :key="n.to" :to="n.to" class="navlink" active-class="on" :exact-active-class="n.exact ? 'on' : ''">{{ n.label }}</RouterLink>
     </nav>
+
+    <button class="search" aria-label="Recherche rapide" @click="$emit('open-search')">
+      <span class="s-ic">⌕</span><span class="s-lbl">Rechercher</span><kbd>⌘K</kbd>
+    </button>
 
     <div class="spacer" />
 
@@ -57,6 +62,11 @@ const nav = [
 .navlink { padding: 8px 14px; border-radius: var(--r-sm); color: var(--ink-2); font-size: 15.5px; font-weight: 500; }
 .navlink:hover { color: var(--ink); background: var(--surface-2); }
 .navlink.on { color: var(--gold); background: var(--gold-soft); }
+.search { display: flex; align-items: center; gap: 8px; margin-left: 6px; padding: 7px 9px 7px 13px; background: var(--canvas); border: 1px solid var(--hairline); border-radius: var(--r-pill); color: var(--ink-3); cursor: pointer; transition: all var(--t1) var(--ease); }
+.search:hover { border-color: var(--hairline-2); color: var(--ink-2); }
+.search .s-ic { font-size: 15px; }
+.search .s-lbl { font-size: 14px; }
+.search kbd { font-family: var(--font-body); font-size: 11px; background: var(--surface-2); border: 1px solid var(--hairline-2); border-radius: var(--r-xs); padding: 2px 6px; color: var(--ink-2); }
 .spacer { flex: 1; }
 .chars { display: flex; gap: 3px; }
 .chardot { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: var(--r-pill); color: var(--ink-3); font-size: 13.5px; transition: all var(--t1) var(--ease); }

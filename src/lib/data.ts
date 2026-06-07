@@ -89,7 +89,8 @@ export function colorToChar(color: string): CharId | null {
 /** Chemin image local (téléchargé) ; fallback distant via image_url. */
 export function imgLocal(kind: 'cards' | 'relics' | 'potions' | 'characters', id: string, image_url: string): string {
   const ext = image_url.endsWith('.png') ? '.png' : '.webp';
-  return `/${kind}/${id.toLowerCase()}${ext}`;
+  // BASE_URL gère le sous-chemin (ex: /spire-companion/) en prod GitHub Pages
+  return `${import.meta.env.BASE_URL}${kind}/${id.toLowerCase()}${ext}`;
 }
 export function imgRemote(image_url: string): string {
   return 'https://spire-codex.com' + image_url;

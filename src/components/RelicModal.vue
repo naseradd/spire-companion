@@ -1,15 +1,30 @@
 <script setup lang="ts">
 import { computed, watch, onBeforeUnmount } from 'vue';
-import type { Relic } from '@/lib/data';
+import type { Relic, Card } from '@/lib/data';
+import { cards } from '@/lib/data';
 import { renderBBCode } from '@/lib/bbcode';
-import { relicScore } from '@/lib/tier';
+import { themesOf } from '@/lib/themes';
+import { relicScore, cardScore } from '@/lib/tier';
 import CardImg from '@/components/ui/CardImg.vue';
+import GameCard from '@/components/GameCard.vue';
 import Badge from '@/components/ui/Badge.vue';
 import ScoreMeter from '@/components/ui/ScoreMeter.vue';
 
 const props = defineProps<{ relic: Relic | null }>();
-const emit = defineEmits<{ (e: 'close'): void }>();
+const emit = defineEmits<{ (e: 'close'): void; (e: 'card', c: Card): void }>();
 const score = computed(() => (props.relic ? relicScore(props.relic.id) : null));
+
+// cartes qui profitent de la relique (thème partagé), par win-impact
+const synergy = computed<Card[]>(() => {
+  const r = props.relic;
+  if (!r) return [];
+  const th = themesOf(`${r.name} ${r.description}`);
+  if (!th.length) return [];
+  return cards
+    .filter((c) => ['Attack', 'Skill', 'Power'].includes(c.type) && themesOf(`${c.name} ${c.description}`).some((t) => th.includes(t)))
+    .sort((a, b) => (cardScore(b.id)?.score ?? -1) - (cardScore(a.id)?.score ?? -1))
+    .slice(0, 6);
+});
 function onKey(e: KeyboardEvent) { if (e.key === 'Escape') emit('close'); }
 watch(() => props.relic, (r) => { if (r) window.addEventListener('keydown', onKey); else window.removeEventListener('keydown', onKey); });
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
@@ -28,6 +43,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
           <p class="desc" v-html="renderBBCode(relic.description)" />
           <p v-if="relic.flavor" class="flavor">« {{ relic.flavor }} »</p>
           <div class="score"><span class="kicker">Win-impact</span><ScoreMeter :score="score" /></div>
+          <div v-if="synergy.length" class="synergy">
+            <span class="kicker">Cartes qui en profitent</span>
+            <div class="syn-grid">
+              <GameCard v-for="s in synergy" :key="s.id" :card="s" mini @open="emit('card', $event)" />
+            </div>
+          </div>
         </div>
       </div>
     </Transition>
@@ -47,6 +68,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 .flavor { font-style: italic; color: var(--ink-3); font-size: 14px; margin: 0 0 14px; }
 .score { border-top: 1px solid var(--hairline); padding-top: 14px; }
 .score .kicker { display: block; margin-bottom: 8px; }
+.synergy { border-top: 1px solid var(--hairline); padding-top: 14px; margin-top: 14px; }
+.synergy .kicker { display: block; margin-bottom: 10px; }
+.syn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
 .cm-enter-active { transition: opacity var(--t2) var(--ease); } .cm-enter-active .modal { transition: transform var(--t2) var(--ease-out-expo); }
 .cm-leave-active { transition: opacity .14s; } .cm-enter-from { opacity: 0; } .cm-enter-from .modal { transform: translateY(14px) scale(.98); }
 </style>

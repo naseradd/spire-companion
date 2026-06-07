@@ -1,15 +1,30 @@
 <script setup lang="ts">
 import { computed, watch, onBeforeUnmount } from 'vue';
 import type { Card } from '@/lib/data';
-import { PLAYABLE, colorToChar } from '@/lib/data';
+import { PLAYABLE, colorToChar, cards } from '@/lib/data';
 import { renderBBCode } from '@/lib/bbcode';
+import { themesOf } from '@/lib/themes';
 import { cardScore } from '@/lib/tier';
 import CardImg from '@/components/ui/CardImg.vue';
+import GameCard from '@/components/GameCard.vue';
 import Badge from '@/components/ui/Badge.vue';
 import ScoreMeter from '@/components/ui/ScoreMeter.vue';
 
 const props = defineProps<{ card: Card | null }>();
-const emit = defineEmits<{ (e: 'close'): void }>();
+const emit = defineEmits<{ (e: 'close'): void; (e: 'open', c: Card): void }>();
+
+// "bonnes choses associées" : cartes de même classe partageant un thème, par win-impact
+const synergy = computed<Card[]>(() => {
+  const c = props.card;
+  if (!c) return [];
+  const th = themesOf(`${c.name} ${c.description}`);
+  if (!th.length) return [];
+  const ch = ownerChar.value || undefined;
+  return cards
+    .filter((x) => x.id !== c.id && (x.color === c.color || x.color === 'colorless') && ['Attack', 'Skill', 'Power'].includes(x.type) && themesOf(`${x.name} ${x.description}`).some((t) => th.includes(t)))
+    .sort((a, b) => (cardScore(b.id, ch)?.score ?? -1) - (cardScore(a.id, ch)?.score ?? -1))
+    .slice(0, 6);
+});
 
 const ownerChar = computed(() => (props.card ? colorToChar(props.card.color) : null));
 const statRows = computed(() => {
@@ -59,6 +74,12 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
                 <ScoreMeter :score="r.score" />
               </div>
             </div>
+            <div v-if="synergy.length" class="synergy">
+              <span class="kicker">Synergies</span>
+              <div class="syn-grid">
+                <GameCard v-for="s in synergy" :key="s.id" :card="s" :char="ownerChar || undefined" mini @open="emit('open', $event)" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -85,6 +106,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 .scores .kicker { margin-bottom: 10px; }
 .srow { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
 .slab { width: 88px; flex: 0 0 auto; font-size: 13px; color: var(--ink-2); }
+.synergy { border-top: 1px solid var(--hairline); padding-top: 14px; margin-top: 16px; }
+.synergy .kicker { display: block; margin-bottom: 10px; }
+.syn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(94px, 1fr)); gap: 8px; }
 .cm-enter-active { transition: opacity var(--t2) var(--ease); }
 .cm-enter-active .modal { transition: transform var(--t2) var(--ease-out-expo); }
 .cm-leave-active { transition: opacity 0.14s; }
