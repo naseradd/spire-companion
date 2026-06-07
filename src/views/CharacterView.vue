@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { cards, relics, charById, cardById, relicById, colorToChar, type Card, type Relic, type CharId } from '@/lib/data';
+import { cards, relics, charById, cardById, relicById, colorToChar, normId, type Card, type Relic, type CharId } from '@/lib/data';
 import { CHAR_META } from '@/lib/characters';
 import { cardScore, relicScore, rankTiers, TIERS, tierColor, type Tier } from '@/lib/tier';
 import { plainText } from '@/lib/bbcode';
@@ -58,8 +58,8 @@ const ZONE: Record<Tier, { label: string; cls: string }> = {
 };
 const traps = computed<Card[]>(() => (lanes.value.find((l) => l.tier === 'D')?.cards ?? []).slice(0, 10));
 
-const startDeck = computed(() => (character.value?.starting_deck ?? []).map((id) => cardById.get(id)).filter(Boolean) as Card[]);
-const startRelics = computed(() => (character.value?.starting_relics ?? []).map((id) => relicById.get(id)).filter(Boolean));
+const startDeck = computed(() => (character.value?.starting_deck ?? []).map((id) => cardById.get(normId(id))).filter(Boolean) as Card[]);
+const startRelics = computed(() => (character.value?.starting_relics ?? []).map((id) => relicById.get(normId(id))).filter(Boolean));
 
 // builds DATA-DRIVEN : matche les vraies cartes de la classe par thème (terms),
 // triées par win-impact. Plus de noms en dur → plus de cases vides.

@@ -94,3 +94,8 @@ export function imgLocal(kind: 'cards' | 'relics' | 'potions' | 'characters', id
 export function imgRemote(image_url: string): string {
   return 'https://spire-codex.com' + image_url;
 }
+
+/** Normalise un id PascalCase (starting_deck/relics) -> UPPER_SNAKE (ids cards/relics). */
+export function normId(s: string): string {
+  return s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[\s-]+/g, '_').toUpperCase();
+}
