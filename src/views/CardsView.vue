@@ -94,7 +94,7 @@ const viewOpts = [{ value: 'gallery', label: 'Galerie' }, { value: 'table', labe
 </template>
 
 <style scoped>
-.page { max-width: 1240px; margin: 0 auto; padding: 28px; }
+.page { max-width: 2000px; margin: 0 auto; padding: 28px clamp(28px, 4vw, 64px); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
 .field { background: var(--canvas); border: 1px solid var(--hairline-2); border-radius: var(--r-sm); color: var(--ink); padding: 9px 12px; font-size: 14.5px; font-family: var(--font-body); }
 .field:focus { outline: none; border-color: var(--accent-dim); box-shadow: 0 0 0 3px var(--accent-soft); }

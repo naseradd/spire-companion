@@ -182,7 +182,7 @@ function goChar(slug: string) { router.push('/c/' + slug); }
 .scrollhint { display: block; margin-top: 34px; font-size: 13px; color: var(--ink-4); letter-spacing: 1px; animation: float-soft 2.6s var(--ease) infinite; }
 
 /* ---- blocks ---- */
-.block { max-width: 1240px; margin: 0 auto; padding: 24px 28px; }
+.block { max-width: 2000px; margin: 0 auto; padding: 24px clamp(28px, 4vw, 64px); }
 .block-head { margin-bottom: 22px; }
 .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
 .class-card {

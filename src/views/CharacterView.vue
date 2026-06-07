@@ -7,7 +7,6 @@ import { cardScore, relicScore, rankTiers, TIERS, tierColor, type Tier } from '@
 import { plainText } from '@/lib/bbcode';
 import CardImg from '@/components/ui/CardImg.vue';
 import GameCard from '@/components/GameCard.vue';
-import CardChip from '@/components/CardChip.vue';
 import CardModal from '@/components/CardModal.vue';
 import RelicModal from '@/components/RelicModal.vue';
 import TierLetter from '@/components/ui/TierLetter.vue';
@@ -186,18 +185,24 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
             <div class="ccols">
               <div class="ccol pick">
                 <span class="ccol-h">✓ À prendre <i>{{ a.g.pick.length }}</i></span>
-                <CardChip v-for="c in a.g.pick" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" @open="openCard = $event" />
-                <span v-if="!a.g.pick.length" class="ccol-empty">—</span>
+                <div class="col-cards">
+                  <GameCard v-for="c in a.g.pick" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" mini @open="openCard = $event" />
+                  <span v-if="!a.g.pick.length" class="ccol-empty">—</span>
+                </div>
               </div>
               <div class="ccol meh">
                 <span class="ccol-h">~ OK <i>{{ a.g.meh.length }}</i></span>
-                <CardChip v-for="c in a.g.meh" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" @open="openCard = $event" />
-                <span v-if="!a.g.meh.length" class="ccol-empty">—</span>
+                <div class="col-cards">
+                  <GameCard v-for="c in a.g.meh" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" mini @open="openCard = $event" />
+                  <span v-if="!a.g.meh.length" class="ccol-empty">—</span>
+                </div>
               </div>
               <div class="ccol skip">
                 <span class="ccol-h">✕ À éviter <i>{{ a.g.skip.length }}</i></span>
-                <CardChip v-for="c in a.g.skip" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" @open="openCard = $event" />
-                <span v-if="!a.g.skip.length" class="ccol-empty">—</span>
+                <div class="col-cards">
+                  <GameCard v-for="c in a.g.skip" :key="c.id" :card="c" :char="charId!" :tier="rankMap.get(c.id)" mini @open="openCard = $event" />
+                  <span v-if="!a.g.skip.length" class="ccol-empty">—</span>
+                </div>
               </div>
             </div>
           </article>
@@ -243,8 +248,8 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
 </template>
 
 <style scoped>
-.page { max-width: 1240px; margin: 0 auto; padding: 28px; }
-.chero { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: center; margin-bottom: 28px; }
+.page { max-width: 2000px; margin: 0 auto; padding: 28px clamp(28px, 4vw, 64px); }
+.chero { display: grid; grid-template-columns: 240px 1fr; gap: 32px; align-items: center; margin-bottom: 28px; }
 .cportrait { border-radius: var(--r-lg); overflow: hidden; background: radial-gradient(120% 100% at 50% 0%, var(--accent-soft), var(--canvas)); border: 1px solid color-mix(in oklab, var(--accent) 40%, var(--hairline)); box-shadow: var(--shadow-md), 0 0 50px var(--accent-glow); aspect-ratio: 3/4; }
 .cname { font-family: var(--font-display); font-weight: 700; font-size: clamp(40px, 6vw, 68px); line-height: 1; margin: 6px 0 12px; }
 .cblurb { font-size: 17px; color: var(--ink-2); max-width: 62ch; line-height: 1.6; margin: 0 0 16px; }
@@ -288,8 +293,9 @@ const accent = computed(() => (charId.value ? `var(--accent)` : 'var(--gold)'));
 .cb-head .build-name { font-size: 22px; margin: 0; }
 .cb-blurb { color: var(--ink-3); font-size: 13.5px; }
 .ccols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: start; }
-.ccol { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: var(--r-sm); background: var(--canvas); border: 1px solid var(--hairline); }
-.ccol-h { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.ccol { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: var(--r-sm); background: var(--canvas); border: 1px solid var(--hairline); }
+.col-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; align-items: start; }
+.ccol-h { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
 .ccol-h i { font-style: normal; font-size: 11px; color: var(--ink-4); margin-left: auto; }
 .ccol.pick { border-color: color-mix(in oklab, var(--good) 30%, var(--hairline)); } .ccol.pick .ccol-h { color: var(--good); }
 .ccol.meh .ccol-h { color: var(--warn); }

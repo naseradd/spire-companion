@@ -5,7 +5,7 @@ import { renderBBCode } from '@/lib/bbcode';
 import { cardScore, scoreTier, isLowSample, tierColor, type Tier } from '@/lib/tier';
 import CardImg from '@/components/ui/CardImg.vue';
 
-const props = defineProps<{ card: Card; char?: string; tier?: Tier | null; verdict?: 'pick' | 'skip' | 'meh' | null }>();
+const props = defineProps<{ card: Card; char?: string; tier?: Tier | null; verdict?: 'pick' | 'skip' | 'meh' | null; mini?: boolean }>();
 defineEmits<{ (e: 'open', c: Card): void }>();
 
 const verdictLabel: Record<string, string> = { pick: 'À prendre', skip: 'À éviter', meh: 'Situationnel' };
@@ -23,7 +23,7 @@ const tier = computed<Tier | null>(() => (props.tier ? props.tier : score.value 
 </script>
 
 <template>
-  <button class="gc" :class="verdict ? 'v-' + verdict : ''" :style="{ '--cc': cc }" @click="$emit('open', card)" :title="card.name">
+  <button class="gc" :class="[verdict ? 'v-' + verdict : '', { mini }]" :style="{ '--cc': cc }" @click="$emit('open', card)" :title="card.name">
     <!-- orbe de coût -->
     <span v-if="cost" class="gc-cost">{{ cost }}</span>
     <span v-if="tier" class="gc-tier" :style="{ color: tierColor(tier), borderColor: tierColor(tier) }">{{ tier }}</span>
@@ -109,4 +109,16 @@ const tier = computed<Tier | null>(() => (props.tier ? props.tier : score.value 
 .v-skip .gc-verdict { background: color-mix(in oklab, var(--bad) 20%, transparent); color: #ef7d6e; }
 .v-skip .gc-art { filter: grayscale(0.35); }
 .v-meh .gc-verdict { background: color-mix(in oklab, var(--warn) 18%, transparent); color: var(--warn); }
+
+/* variante mini (plan de draft) */
+.gc.mini { min-height: 0; padding: 9px 7px 9px; border-radius: 12px; border-width: 1.5px; }
+.gc.mini .gc-cost { width: 23px; height: 23px; font-size: 13px; top: -6px; left: -6px; }
+.gc.mini .gc-tier { width: 20px; height: 20px; font-size: 12px; }
+.gc.mini .gc-banner { min-height: 18px; margin-bottom: 5px; padding: 1px 10px; }
+.gc.mini .gc-name { font-size: 12.5px; }
+.gc.mini .gc-art { width: 76%; border-width: 2px; }
+.gc.mini .gc-type { font-size: 8px; padding: 1px 8px; margin-top: -8px; }
+.gc.mini .gc-text { margin-top: 5px; padding: 6px 6px; border-radius: 7px; }
+.gc.mini .gc-desc { font-size: 10.5px; line-height: 1.28; }
+.gc.mini .gc-verdict { margin-top: 5px; padding: 3px 4px; font-size: 9.5px; }
 </style>
